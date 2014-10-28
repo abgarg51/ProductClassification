@@ -4,15 +4,20 @@ from featureExtractor import extractFeatures
 import json
 import numpy as np
 
+
+print "loading data..."
 with open('data/amazon_review_test.txt', 'r') as f :
     dataset = [json.loads(line) for line in f]
-    
+print 'finished reading json'
+
 reviews = [d['review'] for d in dataset]
 features = [dict(extractFeatures(r)) for r in reviews]
 X = pd.DataFrame(features).fillna(0)
 y = [d['id'] for d in dataset]
 
 clf = linear_model.LogisticRegression()
+print 'running regression...'
 clf.fit(X, y)
+print 'done running regresion'
 predicted_y = clf.predict(X)
 print "Prediction success rate = %.4f"%(sum(predicted_y == y)*1./len(y))
