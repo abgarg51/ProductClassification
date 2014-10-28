@@ -1,23 +1,38 @@
-from sklearn import linear_model, datasets
-import pandas as pd
-from featureExtractor import extractFeatures
-import json
-import numpy as np
+"""
+	regression.py
+	File contains all the learning algorithms that we will use
+"""
+
+from sklearn import linear_model
+import pandas as pd, numpy as np
 
 
-print "loading data..."
-with open('data/amazon_review_test.txt', 'r') as f :
-    dataset = [json.loads(line) for line in f]
-print 'finished reading json'
+class LearningAlgorithm(object):
+	"""
+		LearningAlgorithm is an abstract class. All learning algorithms should have a fit method and a predict method
+	"""
+	def __init__(self):
+		pass
+	def fit(self, X, y):
+		pass
+	def predict(self, X):
+		pass
 
-reviews = [d['review'] for d in dataset]
-features = [dict(extractFeatures(r)) for r in reviews]
-X = pd.DataFrame(features).fillna(0)
-y = [d['id'] for d in dataset]
+class LogisticRegression(LearningAlgorithm):
+	"""
+	LogisticRegression implemented in sklearn
+	"""
+	def __init__(self):
+		self.clf = linear_model.LogisticRegression()
+		self.predicted_y = None
 
-clf = linear_model.LogisticRegression()
-print 'running regression...'
-clf.fit(X, y)
-print 'done running regresion'
-predicted_y = clf.predict(X)
-print "Prediction success rate = %.4f"%(sum(predicted_y == y)*1./len(y))
+	def fit(self, X, y):
+		self.clf.fit(X, y)
+	
+	def predict(self, X):
+		self.predicted_y = self.clf.predict(X)
+		return self.predicted_y
+
+	def classification_error(self, true_y):
+		assert self.predicted_y is not None, 'You have not made any predictions yet!'
+		return sum(self.predicted_y == true_y)*1./len(true_y)
