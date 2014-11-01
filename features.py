@@ -1,7 +1,8 @@
 """feature extractor
 takes in review and returns featuers using bag of words
 """
-import collections 
+import collections
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
 
 class FeatureExtractor(object):
 	"""
@@ -26,5 +27,4 @@ class BagOfWords(FeatureExtractor):
 
 if __name__ == '__main__':
 	featureExtractor = BagOfWords()
-	print 'hi'
 	print featureExtractor.extract_features("A counter tool is provided to support convenient and rapid tallies")
