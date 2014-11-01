@@ -33,6 +33,5 @@ class LogisticRegression(LearningAlgorithm):
 		self.predicted_y = self.clf.predict(X)
 		return self.predicted_y
 
-	def classification_error(self, true_y):
-		assert self.predicted_y is not None, 'You have not made any predictions yet!'
-		return sum(self.predicted_y == true_y)*1./len(true_y)
+	def score(self, X, y, weight = None):
+		return self.clf.score(X, y, weight)
