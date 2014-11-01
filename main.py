@@ -3,15 +3,14 @@ import regression, util, features, pandas as pd
 if __name__  == '__main__':
 	# read the data set
 	dataset = util.load_data(source_file = 'amazon_review_test.txt')
-	# extract the reviews and convert reviews into features. features is a list of sparse dicts
-	reviews = [d['review'] for d in dataset]
+	# corpus is a list of all the reviews
+	corpus = [d['review'] for d in dataset]
 	print 'Extracting features...'
 
-	feature_extractor = features.BagOfWords()
-	features = [dict(feature_extractor.extract_features(r)) for r in reviews]
-
+	# use BagOfWords with TFIDF normalizationn
+	vectorizer = features.TfidfVectorizer(min_df=1)
 	# put features into a pandas dataframe and fill 0 entries
-	X = pd.DataFrame(features).fillna(0)
+	X = vectorizer.fit_transform(reviews)
 	# set y to targets nodes
 	y = [d['id'] for d in dataset]
 
