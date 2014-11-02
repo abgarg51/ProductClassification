@@ -5,12 +5,16 @@ from collections import Counter
 
 ######################################
 # How to use:
-# Put unziped amazon_products and AmazonHeirarchy.json under ./data, then run this script without
-# output file will be ./data/amazon_review.txt
+# Put unziped amazon_products and AmazonHeirarchy.json under ./data, 
+# rename the amazon_products to amazon_products.dat
+# download and unzip Social_Conversations_AmazonLabel.json.gz into ./data, rename it to Social_Conversations_AmazonLabel.json.dat
+# then run this script with 3 or 4 arguments.
+# run with no arguments to show meaning of arguments.
+#
 # output format is:
 # each line is a json object, contains a dict with key "review" for the review text, and "id" for the BrowseNodeId
 #
-# Note: amazon_products or the output file are too large to upload to github.
+# Note: amazon_products or the full output file are too large to upload to github.
 # Warning: the script is silentlly discarding mis-formated Items.
 ######################################
 
@@ -223,10 +227,10 @@ if __name__ == "__main__":
 	if ((len(sys.argv) != 4 and len(sys.argv) != 5) or sys.argv[1] not in channels):
 		print "Example: data_reader.py amazon 2 ./data/amazone_art.txt"
 		print "Or:      data_reader.py twitter 2 ./data/twitter_app.txt 200"
-		print "1st argument is the data source in one of these: [amazon,twitter, ebay]"
-		print "2nd argument is the catogoryID as in following list"
+		print "1st argument is the data source in one of these: [amazon, twitter, ebay]"
+		print "2nd argument is the int catogory index as in following list"
 		print "3rd argument is the output file name"
-		print "4th argument is optional, and can be used to limit number of products processed"
+		print "4th argument is optional, an int number, can be used to limit number of products processed"
 		printRootCatgoryNames(rootCatgoryNames)
 		exit()
 
