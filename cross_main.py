@@ -10,7 +10,9 @@ if __name__ == '__main__':
     X = {}
     y = {}
 
-    limit = 1000
+    # Set this smaller if you want to interate faster. controls the max_examples
+    # 1000 ~ 1 minute, 10000 ~10 min, 1,000,000 ~ 45 min
+    max_examples = 1000
 
     # load data from all the sources
     for source in [master_source] + external_sources:
@@ -18,8 +20,8 @@ if __name__ == '__main__':
         print 'Loading %s data for %s from %s'%(tree_category, source, source_file)
         dataset[source] = util.load_data(source_file = source_file)
         # corpus is a list of all the reviews
-        corpus[source] = [d['review'] for d in dataset[source]][:limit]
-        y[source] = [d['id'] for d in dataset[source]][:limit]
+        corpus[source] = [d['review'] for d in dataset[source]][:max_examples]
+        y[source] = [d['id'] for d in dataset[source]][:max_examples]
         
     # Create feature extractor for master_source
     master_vectorizer = features.TfidfVectorizer(min_df=1)
