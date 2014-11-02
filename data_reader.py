@@ -252,12 +252,12 @@ if __name__ == "__main__":
 	nodeIdToCatgoryDict = getCatgoryDictForRootParent(amazoneTrees, category)
 
 	if (channel == 'amazon'):
-		parseAmazonDataWithNodeIDDict('./data/amazon_products', nodeIdToCatgoryDict, outFileName, outputLineCountLimit)
+		parseAmazonDataWithNodeIDDict('./data/amazon_products.dat', nodeIdToCatgoryDict, outFileName, outputLineCountLimit)
 	elif(channel == 'ebay'):
 		print "Processing eBay data."
-		parseSocialDataWithNodeIDDict('ebay','./data/Social_Conversations_AmazonLabel.json.org', nodeIdToCatgoryDict, outFileName, outputLineCountLimit)
+		parseSocialDataWithNodeIDDict('ebay','./data/Social_Conversations_AmazonLabel.json.dat', nodeIdToCatgoryDict, outFileName, outputLineCountLimit)
 	elif(channel == 'twitter'):
-		parseSocialDataWithNodeIDDict('tw','./data/Social_Conversations_AmazonLabel.json.org', nodeIdToCatgoryDict, outFileName, outputLineCountLimit)
+		parseSocialDataWithNodeIDDict('tw','./data/Social_Conversations_AmazonLabel.json.dat', nodeIdToCatgoryDict, outFileName, outputLineCountLimit)
 		print "Processing twitter"
 	else:
 		#should not get here anyway....
