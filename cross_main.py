@@ -1,4 +1,13 @@
+"""
+    This script will only work if you've generated all the data
+    python data_reader.py amazon 5 data/amazon_books.dat
+    python data_reader.py ebay 5 data/ebay_books.dat
+    python data_reader.py twitter 5 data/twitter_books.dat
+"""
+
 import regression, util, features, pandas as pd, sklearn
+
+
 
 if __name__ == '__main__':
     master_source = 'amazon'
