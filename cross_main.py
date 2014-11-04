@@ -5,7 +5,7 @@
     python data_reader.py twitter 5 data/twitter_books.dat
 """
 
-import regression, util, features, pandas as pd, sklearn, numpy as np
+import regression, util, features, pandas as pd, sklearn, numpy as np, os 
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib import pyplot as plt
 
@@ -41,7 +41,6 @@ def learn_cross_domain(master_source, external_sources, corpus, y, max_examples 
             random_state += 1
             print 'Training labels are not a superset of the testing labels. Trying different random seed: %d'%random_state
             
-
     # Create regression and train on master_source training set
     clf = regression.LogisticRegression()
     print 'running regression...'
@@ -63,26 +62,37 @@ def learn_cross_domain(master_source, external_sources, corpus, y, max_examples 
 
     #import pdb; pdb.set_trace()
     # plotting
-    pp = PdfPages('plots_trained_on_%s.pdf'%master_source)
-    for i, source in enumerate([master_source] + external_sources):
-        # generate confusion matrix
-        y_pred = clf.predict(X[source])
-        cm = sklearn.metrics.confusion_matrix(y[source], y_pred)
+    with PdfPages('plots_trained_on_%s.pdf'%master_source) as pp:
+        for fignum, external_source in enumerate([master_source] + external_sources):
+            # generate confusion matrix
+            y_pred = clf.predict(X[external_source])
+            y_true = y[external_source]
+            generate_confusion_matrix_plot(master_source, external_source, y_pred, y_true, pp, fignum)
 
-        # normalize along the row
-        row_sums = cm.sum(axis=1)
-        cm_normalized = 1.0 * cm / row_sums[:, np.newaxis]
+def generate_confusion_matrix_plot(master_source, external_source, y_pred, y_true, pp, fignum):
+    cm = sklearn.metrics.confusion_matrix(y_true, y_pred)
+    # write out keys for labels:
+    cm_keys = list(set(y_true).union(set(y_pred)))
+    cm_keys.sort()
+    output_pathname = os.path.join('scratch', '%s_trained_on_%s_cm_keys'%(master_source, external_source))
+    with open(output_pathname, 'w+') as f:
+        for i, k in enumerate(cm_keys):
+            f.write('%d --> %s\n'%(i, k))
 
-        # plot confusion matrix
-        plt.figure(i, figsize=(15,12))
-        plt.clf()
-        plt.matshow(cm_normalized,fignum=i)
-        plt.title('Confusion matrix for %s trained on %s'%(source.upper(), master_source.upper()))
-        plt.colorbar()
-        plt.ylabel('True label')
-        plt.xlabel('Predicted label')
-        pp.savefig()
-    pp.close()
+    # normalize along the row
+    row_sums = cm.sum(axis=1)
+    cm_normalized = 1.0 * cm / row_sums[:, np.newaxis]
+
+    # plot confusion matrix
+    plt.figure(fignum, figsize=(15,12))
+    plt.clf()
+    plt.matshow(cm_normalized, fignum = fignum)
+    plt.title('Confusion matrix for %s trained on %s'%(external_source.upper(), master_source.upper()))
+    plt.colorbar()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    pp.savefig()
+
 if __name__ == '__main__':
     all_sources = ['amazon', 'twitter', 'ebay']
     tree_category = 'books'
