@@ -5,23 +5,16 @@
     python data_reader.py twitter 5 data/twitter_books.dat
 """
 
-import regression, util, features, pandas as pd, sklearn
+import regression, util, features, pandas as pd, sklearn, numpy as np
+from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib import pyplot as plt
 
-
-
-if __name__ == '__main__':
-    master_source = 'amazon'
-    external_sources = ['twitter', 'ebay']
-    tree_category = 'books'
-
+def learn_cross_domain(master_source, external_sources, tree_category, max_examples = 1000):
     dataset = {}
     corpus = {}
     X = {}
     y = {}
-
-    # Set this smaller if you want to interate faster. controls the max_examples
-    # 1000 ~ 1 minute, 10000 ~10 min, 1,000,000 ~ 45 min
-    max_examples = 1000
+   
 
     # load data from all the sources
     for source in [master_source] + external_sources:
@@ -39,8 +32,15 @@ if __name__ == '__main__':
     X[master_source] = master_vectorizer.fit_transform(corpus[master_source])
 
     # split test/train for master_source
-    X_train, X_test, y_train, y_test = sklearn.cross_validation.train_test_split(X[master_source], y[master_source], test_size = 0.3, random_state = 42)
-    assert set(y_train) == set(y_test), 'Not all labels are in both test and train. Try different random seed'
+    random_state = 42
+    while True:
+        X_train, X_test, y_train, y_test = sklearn.cross_validation.train_test_split(X[master_source], y[master_source], test_size = 0.3, random_state = random_state)
+        if set(y_train).issuperset(set(y_test)):
+            break
+        else:
+            random_state += 1
+            print 'Training labels are not a superset of the testing labels. Trying different random seed: %d'%random_state
+            
 
     # Create regression and train on master_source training set
     clf = regression.LogisticRegression()
@@ -60,3 +60,44 @@ if __name__ == '__main__':
         X[source] = vectorizer.fit_transform(corpus[source])
         # Report the scores
         print "%s trained on %s score = %.4f"%(source, master_source, clf.score(X[source], y[source]))
+
+    #import pdb; pdb.set_trace()
+    # plotting
+    pp = PdfPages('plots_trained_on_%s.pdf'%master_source)
+    for i, source in enumerate([master_source] + external_sources):
+        # generate confusion matrix
+        y_pred = clf.predict(X[source])
+        cm = sklearn.metrics.confusion_matrix(y[source], y_pred)
+
+        # normalize along the row
+        row_sums = cm.sum(axis=1)
+        cm_normalized = 1.0 * cm / row_sums[:, np.newaxis]
+
+        # plot confusion matrix
+        plt.figure(i, figsize=(15,12))
+        plt.clf()
+        plt.matshow(cm_normalized,fignum=i)
+        plt.title('Confusion matrix for %s trained on %s'%(source.upper(), master_source.upper()))
+        plt.colorbar()
+        plt.ylabel('True label')
+        plt.xlabel('Predicted label')
+        pp.savefig()
+    pp.close()
+if __name__ == '__main__':
+    combos = [('amazon', ['twitter', 'ebay'], 'books'),
+                ('twitter', ['amazon', 'ebay'], 'books'),
+                ('ebay', ['amazon', 'twitter'], 'books'),
+                ]
+    for master_source, external_sources, tree_category in combos:
+        learn_cross_domain(master_source, external_sources, tree_category, max_examples = 4000)
+
+
+    """
+    Example for a single run
+    master_source = 'amazon'
+    external_sources = ['twitter', 'ebay']
+    tree_category = 'books'
+    learn_cross_domain(master_source, external_sources, tree_category)
+    """
+
+    
