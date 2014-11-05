@@ -8,6 +8,7 @@
 import regression, util, features, pandas as pd, sklearn, numpy as np, os 
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib import pyplot as plt
+from optparse import OptionParser
 
 def read_from_sources(sources, tree_category, max_examples = 1000):
     # Return the an ordered pair of dicts, the Corpus for each source and the targets for each source
@@ -94,6 +95,12 @@ def generate_confusion_matrix_plot(master_source, external_source, y_pred, y_tru
     pp.savefig()
 
 if __name__ == '__main__':
+    parser = OptionParser()
+    parser.add_option("-n", "--max_examples", dest="max_examples",
+                    default=1000000,
+                  help="Max examples to read from each datasource")
+    (options, args) = parser.parse_args()
+
     all_sources = ['amazon', 'twitter', 'ebay']
     tree_category = 'books'
     combos = [('amazon', ['twitter', 'ebay'], tree_category),
@@ -101,7 +108,7 @@ if __name__ == '__main__':
                 ('ebay', ['amazon', 'twitter'], tree_category),
                 ]
 
-    corpus, y = read_from_sources(all_sources, tree_category = tree_category, max_examples = 10000)
+    corpus, y = read_from_sources(all_sources, tree_category = tree_category, max_examples = options.max_examples)
     for master_source, external_sources, tree_category in combos:
         learn_cross_domain(master_source, external_sources, corpus, y)
 
