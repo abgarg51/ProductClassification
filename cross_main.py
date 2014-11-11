@@ -10,20 +10,6 @@ from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib import pyplot as plt
 from optparse import OptionParser
 
-def read_from_sources(sources, tree_category, max_examples = 1000):
-    # Return the an ordered pair of dicts, the Corpus for each source and the targets for each source
-    dataset = {}
-    corpus = {}
-    y = {}
-    for source in sources:
-        source_file = '%s_%s.dat'%(source, tree_category)
-        print 'Loading %s data for %s from %s'%(tree_category, source, source_file)
-        dataset[source] = util.load_data(source_file = source_file)
-        # corpus is a list of all the reviews
-        corpus[source] = [d['review'] for d in dataset[source]][:max_examples]
-        y[source] = [d['id'] for d in dataset[source]][:max_examples]
-    return corpus, y
-
 def learn_cross_domain(master_source, external_sources, corpus, y, max_examples = 1000):  
     # Create feature extractor for master_source
     master_vectorizer = features.TfidfVectorizer(min_df=1)
@@ -99,6 +85,7 @@ if __name__ == '__main__':
     parser.add_option("-n", "--max_examples", dest="max_examples",
                     default=1000000,
                   help="Max examples to read from each datasource")
+    parser.add_option('-s', '--stem-corpus', dest='use_stemming', action='store_true')
     (options, args) = parser.parse_args()
 
     all_sources = ['amazon', 'twitter', 'ebay']
@@ -107,11 +94,12 @@ if __name__ == '__main__':
                 ('twitter', ['amazon', 'ebay'], tree_category),
                 ('ebay', ['amazon', 'twitter'], tree_category),
                 ]
+    corpus, y = util.read_from_sources(all_sources, tree_category = tree_category, max_examples = int(options.max_examples))
+    
+    corpus = util.stem_corpus(corpus) if options.use_stemming is True else corpus
 
-    corpus, y = read_from_sources(all_sources, tree_category = tree_category, max_examples = options.max_examples)
     for master_source, external_sources, tree_category in combos:
         learn_cross_domain(master_source, external_sources, corpus, y)
-
 
     """
     Example for a single run
