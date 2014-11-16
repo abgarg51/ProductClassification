@@ -15,7 +15,7 @@ def remove_punctuation(sentence):
 
 with open('stopwords.txt', 'r') as f:
   for line in f:
-    stopwords.append(remove_punctuation(line.strip())
+    stopwords.append(remove_punctuation(line.strip()))
 
 
 def load_data(source_file = 'amazon_review_test.txt'):
