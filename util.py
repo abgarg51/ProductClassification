@@ -8,9 +8,14 @@ from stemming.porter2 import stem
 data_directory = 'data' # directory that all data is stored in
 
 stopwords = []
+
+def remove_punctuation(sentence):
+  table = string.maketrans("","")
+  return sentence.translate(table, string.punctuation)
+
 with open('stopwords.txt', 'r') as f:
   for line in f:
-    stopwords.append(line.strip())
+    stopwords.append(remove_punctuation(line.strip())
 
 
 def load_data(source_file = 'amazon_review_test.txt'):
@@ -58,10 +63,6 @@ def remove_stopwords(sentence):
   pattern = re.compile(r'\b(' + r'|'.join(stopwords) + r')\b\s*')
   sentence = pattern.sub('', sentence)
   return sentence
-
-def remove_punctuation(sentence):
-  table = string.maketrans("","")
-  return sentence.translate(table, string.punctuation)
 
 def clean_sentence(sentence, stem = True, stopwords = True, punctuation = True, lower = True):
   return remove_stopwords(stem_sentence(remove_punctuation(sentence.lower()))) 
