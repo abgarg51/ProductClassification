@@ -7,17 +7,14 @@ corpus, y = util.read_from_sources(all_sources, tree_category = tree_category, m
 
 reviews = corpus[all_sources[0]]
 
-stoplist = set('for a of the and to in'.split())
-texts = [[word for word in r.lower().split() if word not in stoplist]
-          for r in reviews]
+reviews = [util.clean_sentence(review) for review in reviews]
 
+dictionary = corpora.Dictionary(reviews)
 
-dictionary = corpora.Dictionary(texts)
+corpus_bow = [dictionary.doc2bow(review) for review in reviews]
 
-corpus = [dictionary.doc2bow(text) for text in texts]
+model = models.hdpmodel.HdpModel(corpus_bow, id2word=dictionary)
 
-model = models.hdpmodel.HdpModel(corpus, id2word=dictionary)
-
-corpus_eval =  model.inference(corpus)
+corpus_eval =  model.inference(corpus_bow)
 
 model.show_topics(100)
