@@ -3,9 +3,15 @@
 	File contains utilities
 """
 
-import sys, os, json
+import sys, os, json, re, string
 from stemming.porter2 import stem
 data_directory = 'data' # directory that all data is stored in
+
+stopwords = []
+with open('stopwords.txt', 'r') as f:
+  for line in f:
+    stopwords.append(line.strip())
+
 
 def load_data(source_file = 'amazon_review_test.txt'):
 	print "loading data..."
@@ -48,6 +54,22 @@ def stem_corpus(corpus):
   stemmed_corpus = {source: [stem_sentence(review) for review in reviews] for source, reviews in corpus.items()}
   return stemmed_corpus
 
+def remove_stopwords(sentence):
+  pattern = re.compile(r'\b(' + r'|'.join(stopwords) + r')\b\s*')
+  sentence = pattern.sub('', sentence)
+  return sentence
+
+def remove_punctuation(sentence):
+  table = string.maketrans("","")
+  return sentence.translate(table, string.punctuation)
+
+def clean_sentence(sentence, stem = True, stopwords = True, punctuation = True, lower = True):
+  return remove_stopwords(stem_sentence(remove_punctuation(sentence.lower()))) 
+
 if __name__ == '__main__':
-  sentence = 'running down the street'
-  print stem_sentence(sentence)
+  sentence = 'running! Down.. the street? some more words'
+  print 'ORIGINAL:', sentence 
+  print 'STEMMING:', stem_sentence(sentence)
+  print 'STOPWORDS:', remove_stopwords(sentence)
+  print 'PUNCUTATION:', remove_punctuation(sentence)
+  print 'ALL:', clean_sentence(sentence)
