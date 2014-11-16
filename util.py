@@ -65,6 +65,8 @@ def remove_stopwords(sentence):
   return sentence
 
 def clean_sentence(sentence, stem = True, stopwords = True, punctuation = True, lower = True):
+  if isinstance(sentence, unicode):
+    sentence = sentence.encode('ascii', 'ignore')
   return remove_stopwords(stem_sentence(remove_punctuation(sentence.lower()))) 
 
 if __name__ == '__main__':
