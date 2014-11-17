@@ -55,7 +55,9 @@ def getCatgoryDictForRootParent(trees,rootParentName):
 				getChildren(child, catId)
 
 	print "CategoryID to Name mapping FYI:"
-	print catogoryIdToNameDict
+	for cat in catogoryIdToNameDict.keys():
+		print cat, " --> ", catogoryIdToNameDict[cat]
+	#print catogoryIdToNameDict
 	#print nodeIds
 	#print nodeIdToCatgoryDict
 	print "nodeID count in dict: ", len(nodeIdToCatgoryDict)
@@ -98,6 +100,7 @@ def parseAmazonDataWithNodeIDDict(rawDataFileName,nodeIdToCatgoryDict,ouputFileN
 		reviewCount = 0
 		matchingProdCount = 0
 		progressPrintCount = 0
+		categoryCounter = Counter()
 		for line in data_file:
 			try:
 				item = json.loads(line.strip()[:-1])
@@ -132,6 +135,7 @@ def parseAmazonDataWithNodeIDDict(rawDataFileName,nodeIdToCatgoryDict,ouputFileN
 			for nodeID in browseNodeIDs:
 				categoryIDs[nodeIdToCatgoryDict[nodeID]] += 1
 			categoryIDMaxMatch = max(categoryIDs, key=categoryIDs.get)
+			categoryCounter[categoryIDMaxMatch] += 1
 
 			#start to print
 			for text in reviewTexts:
@@ -146,6 +150,11 @@ def parseAmazonDataWithNodeIDDict(rawDataFileName,nodeIdToCatgoryDict,ouputFileN
 				break
 	print ""
 	print "Processed ", productCount, " products, with ", reviewCount, "reviews, ", matchingProdCount, "of products are match and exported."
+	
+	print "category counts:"
+	print "BrowseNodeID \t count"
+	for cat in categoryCounter:
+		print cat, "\t", categoryCounter[cat], "\t"
 	print "content exported to:", ouputFileName
 
 def parseSocialDataWithNodeIDDict(channelName, inputFileName, nodeIdToCatgoryDict, outFileName, outputLineCountLimit):
@@ -154,6 +163,7 @@ def parseSocialDataWithNodeIDDict(channelName, inputFileName, nodeIdToCatgoryDic
 		matchingProdCount = 0
 		progressPrintCount = 0
 		textCount = 0
+		categoryCounter = Counter()
 		for line in data_file:
 			textCount += 1
 			try:
@@ -199,6 +209,7 @@ def parseSocialDataWithNodeIDDict(channelName, inputFileName, nodeIdToCatgoryDic
 			for nodeID in browseNodeIDs:
 				categoryIDs[nodeIdToCatgoryDict[nodeID]] += 1
 			categoryIDMaxMatch = max(categoryIDs, key=categoryIDs.get)
+			categoryCounter[categoryIDMaxMatch] += 1
 
 			#TODO: add check before adding it as match.
 			matchingProdCount += 1
@@ -212,6 +223,12 @@ def parseSocialDataWithNodeIDDict(channelName, inputFileName, nodeIdToCatgoryDic
 				break
 	print ""
 	print "Processed ", textCount, " texts, from channel ", channelName, ", ", matchingProdCount, "of them are match and exported."
+	
+	print "category counts:"
+	print "BrowseNodeID \t count"
+	for cat in categoryCounter:
+		print cat, "\t", categoryCounter[cat], "\t"
+
 	print "content exported to:", outFileName
 
 
