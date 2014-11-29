@@ -18,6 +18,7 @@ def learn_cross_domain(master_source, external_sources, corpus, y, max_examples 
     X = {}
     X[master_source] = master_vectorizer.fit_transform(corpus[master_source])
 
+
     # split test/train for master_source
     random_state = 42
     while True:
@@ -89,14 +90,35 @@ if __name__ == '__main__':
     (options, args) = parser.parse_args()
 
     all_sources = ['amazon', 'twitter', 'ebay']
+    mix_sources = ['amazon+twitter', 'amazon+ebay', 'twitter+ebay', 'amazon+twitter+ebay']
     tree_category = 'books'
     combos = [('amazon', ['twitter', 'ebay'], tree_category),
                 ('twitter', ['amazon', 'ebay'], tree_category),
                 ('ebay', ['amazon', 'twitter'], tree_category),
+                #new mixed traning set test
+                ('amazon+twitter', ['amazon','twitter', 'ebay'], tree_category),
+                ('amazon+ebay', ['amazon','twitter', 'ebay'], tree_category),
+                ('twitter+ebay', ['amazon','twitter', 'ebay'], tree_category),
+                ('amazon+twitter+ebay', ['amazon','twitter', 'ebay'], tree_category),
+
                 ]
     corpus, y = util.read_from_sources(all_sources, tree_category = tree_category, max_examples = int(options.max_examples))
     
     corpus = util.stem_corpus(corpus) if options.use_stemming is True else corpus
+
+#generate combined corpus and y, for mixed traning set test.
+    for mix in mix_sources:
+        sourceList = mix.split('+')
+
+        newY = []
+        newCorpus = []
+        for source in sourceList:
+            newY = newY + y[source]
+            newCorpus = newCorpus + corpus[source]
+        y[mix] = newY
+        corpus[mix] = newCorpus
+
+        
 
     for master_source, external_sources, tree_category in combos:
         learn_cross_domain(master_source, external_sources, corpus, y)

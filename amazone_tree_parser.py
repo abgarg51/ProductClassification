@@ -79,22 +79,32 @@ def getCatgoryNamesForRootParent(trees,rootParentName):
 if __name__ == "__main__":
 	amazoneTrees = loadAmazoneHeirarchyTree('./data/AmazonHeirarchy.json')
 	ouputFileName = "./data/amazonCategoryNames.txt"
+	scratchFileName = "./scratch/amazon_category_names.txt"
 	rootCatgoryNames = getRootCatgoryNames(amazoneTrees)
 	outFile = io.open(ouputFileName, "w", encoding='utf-8')
+	scratchFile = io.open(scratchFileName, "w")
 
 	outputDict = {}
 
 	for cat in rootCatgoryNames:
 		names = getCatgoryNamesForRootParent(amazoneTrees, cat)
 		outputDict[cat] = names
+		for name in names.keys():
+			scratchText =  u' '.join((cat, " --> " , name , " --> " , names[name])).encode('utf-8').strip()
+			#cat + " --> " + name + " --> " + names[name].encode('utf-8').strip()
+			print scratchText
+			scratchFile.write(unicode(scratchText, errors='ignore')+'\n')
+
 
 	outFile.write(unicode(json.dumps(outputDict, ensure_ascii=False)))
 	#outFile.write(unicode('\n'))
 
-	print "amazone category information exported to: ", ouputFileName
+	print "amazone category information exported to: ", ouputFileName, " as Json dict."
 	print "Format:"
 	print "it's a Json of a dict, keys are root category names. Value is another Dict."
 	print "Value dict has catgoryID as keys, and names as values"
+	print "==========================================================================="
+	print "Also exported to ", scratchFileName, "with txt format"
 
 	#print outputDict
 
