@@ -80,9 +80,11 @@ if __name__ == "__main__":
 	amazoneTrees = loadAmazoneHeirarchyTree('./data/AmazonHeirarchy.json')
 	ouputFileName = "./data/amazonCategoryNames.txt"
 	scratchFileName = "./scratch/amazon_category_names.txt"
+	scratchCSVFileName = "./scratch/amazon_category_names.csv"
 	rootCatgoryNames = getRootCatgoryNames(amazoneTrees)
 	outFile = io.open(ouputFileName, "w", encoding='utf-8')
 	scratchFile = io.open(scratchFileName, "w")
+	csvFile = io.open(scratchCSVFileName, "w")
 
 	outputDict = {}
 
@@ -91,9 +93,11 @@ if __name__ == "__main__":
 		outputDict[cat] = names
 		for name in names.keys():
 			scratchText =  u' '.join((cat, " --> " , name , " --> " , names[name])).encode('utf-8').strip()
+			csvText = u' '.join((name , "," , names[name])).encode('utf-8').strip()
 			#cat + " --> " + name + " --> " + names[name].encode('utf-8').strip()
 			print scratchText
 			scratchFile.write(unicode(scratchText, errors='ignore')+'\n')
+			csvFile.write(unicode(csvText, errors='ignore')+'\n')
 
 
 	outFile.write(unicode(json.dumps(outputDict, ensure_ascii=False)))
