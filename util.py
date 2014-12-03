@@ -69,6 +69,49 @@ def clean_sentence(sentence, stem = True, stopwords = True, punctuation = True, 
     sentence = sentence.encode('ascii', 'ignore')
   return remove_stopwords(stem_sentence(remove_punctuation(sentence.lower()))) 
 
+
+"""
+  Info
+"""
+info = """Index:  0   Appliances
+Index:  1   ArtsAndCrafts
+Index:  2   Automotive
+Index:  3   Baby
+Index:  4   Beauty
+Index:  5   Books
+Index:  6   Music
+Index:  7   Collectibles
+Index:  8   Movies & TV
+Index:  9   Electronics
+Index:  10  Grocery
+Index:  11  HealthPersonalCare
+Index:  12  Tools
+Index:  13  KindleStore
+Index:  14  Kitchen
+Index:  15  LawnAndGarden
+Index:  16  Magazines
+Index:  17  Everything Else
+Index:  18  MobileApps
+Index:  19  MusicalInstruments
+Index:  20  OfficeProducts
+Index:  21  Software
+Index:  22  SportingGoods
+Index:  23  Toys
+Index:  24  VideoGames
+"""
+temp = [x.split() for x in info.split('\n')]
+index_to_name_dict = {row[1]: ''.join(row[2:]).lower() for row in temp if len(row) > 2}
+all_sources = ['amazon', 'ebay', 'twitter']
+
+# handle browse node to string
+import csv
+node_to_string = {}
+with open('scratch/amazon_category_names.txt', 'r+') as csvfile:
+  reader = csv.reader(csvfile, delimiter='\t')
+  for row in reader:
+    tree_category, node, name = row
+    node_to_string[int(node)] = name.strip()
+
 if __name__ == '__main__':
   sentence = 'running! Down.. the street? some more words'
   print 'ORIGINAL:', sentence 
@@ -76,3 +119,4 @@ if __name__ == '__main__':
   print 'STOPWORDS:', remove_stopwords(sentence)
   print 'PUNCUTATION:', remove_punctuation(sentence)
   print 'ALL:', clean_sentence(sentence)
+  print node_to_string
