@@ -32,7 +32,7 @@ Index:  24 	VideoGames
 
 temp = [x.split() for x in info.split('\n')]
 d = {row[1]: ''.join(row[2:]).lower() for row in temp if len(row) > 2}
-data_sources = ['amazon', 'ebay', 'twitter']
+data_sources = ['amazon',]# 'ebay', 'twitter']
 
 from multiprocessing import Pool
 from subprocess import call
@@ -49,7 +49,7 @@ def shell_wrapper(l):
 command_list = []
 for source in data_sources:
     for index, name in d.items():
-        command_list.append(['python', os.path.join(project_dir, 'data_reader.py'), source, index, os.path.join(project_dir, '%s_%s.dat'%(source, name))])
+        command_list.append(['python', os.path.join(project_dir, 'data_reader.py'), source, index, os.path.join(project_dir, 'data', '%s_%s.dat'%(source, name))])
 
 # run shell_wrapper on command_list items in parallel
 p.map(shell_wrapper, command_list)

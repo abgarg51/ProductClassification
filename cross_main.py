@@ -10,7 +10,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib import pyplot as plt
 from optparse import OptionParser
 
-def learn_cross_domain(master_source, external_sources, corpus, y, max_examples = 1000):  
+def learn_cross_domain(master_source, external_sources, corpus, y, tree_category, max_examples = 1000):  
     # Create feature extractor for master_source
     master_vectorizer = features.TfidfVectorizer(min_df=1)
 
@@ -50,7 +50,7 @@ def learn_cross_domain(master_source, external_sources, corpus, y, max_examples 
 
     #import pdb; pdb.set_trace()
     # plotting
-    with PdfPages('plots_trained_on_%s.pdf'%master_source) as pp:
+    with PdfPages('plots_trained_on_%s_for_%s.pdf'%(master_source, tree_category)) as pp:
         for fignum, external_source in enumerate([master_source] + external_sources):
             # generate confusion matrix
             y_pred = clf.predict(X[external_source])
@@ -58,10 +58,11 @@ def learn_cross_domain(master_source, external_sources, corpus, y, max_examples 
             generate_confusion_matrix_plot(master_source, external_source, y_pred, y_true, pp, fignum)
 
 def generate_confusion_matrix_plot(master_source, external_source, y_pred, y_true, pp, fignum):
-    cm = sklearn.metrics.confusion_matrix(y_true, y_pred)
-    # write out keys for labels:
     cm_keys = list(set(y_true).union(set(y_pred)))
     cm_keys.sort()
+    cm = sklearn.metrics.confusion_matrix(y_true, y_pred, cm_keys)
+    # write out keys for labels:
+
     output_pathname = os.path.join('scratch', '%s_trained_on_%s_cm_keys'%(master_source, external_source))
     with open(output_pathname, 'w+') as f:
         for i, k in enumerate(cm_keys):
@@ -91,10 +92,12 @@ if __name__ == '__main__':
 
     all_sources = ['amazon', 'twitter', 'ebay']
     mix_sources = ['amazon+twitter', 'amazon+ebay', 'twitter+ebay', 'amazon+twitter+ebay']
-    tree_category = 'books'
+    tree_category = 'videogames'
+    
     combos = [('amazon', ['twitter', 'ebay'], tree_category),
                 ('twitter', ['amazon', 'ebay'], tree_category),
-                ('ebay', ['amazon', 'twitter'], tree_category),
+                ('ebay', ['amazon', 'twitter'], tree_category),]
+    """
                 #new mixed traning set test
                 ('amazon+twitter', ['amazon','twitter', 'ebay'], tree_category),
                 ('amazon+ebay', ['amazon','twitter', 'ebay'], tree_category),
@@ -102,11 +105,14 @@ if __name__ == '__main__':
                 ('amazon+twitter+ebay', ['amazon','twitter', 'ebay'], tree_category),
 
                 ]
+    """
     corpus, y = util.read_from_sources(all_sources, tree_category = tree_category, max_examples = int(options.max_examples))
     
     corpus = util.stem_corpus(corpus) if options.use_stemming is True else corpus
-
+    for master_source, external_sources, tree_category in combos:
+        learn_cross_domain(master_source, external_sources, corpus, y, tree_category)
 #generate combined corpus and y, for mixed traning set test.
+"""
     for mix in mix_sources:
         sourceList = mix.split('+')
 
@@ -118,17 +124,16 @@ if __name__ == '__main__':
         y[mix] = newY
         corpus[mix] = newCorpus
 
-        
+"""    
 
-    for master_source, external_sources, tree_category in combos:
-        learn_cross_domain(master_source, external_sources, corpus, y)
 
-    """
-    Example for a single run
-    master_source = 'amazon'
-    external_sources = ['twitter', 'ebay']
-    tree_category = 'books'
-    learn_cross_domain(master_source, external_sources, tree_category)
-    """
+
+"""
+Example for a single run
+master_source = 'amazon'
+external_sources = ['twitter', 'ebay']
+tree_category = 'books'
+learn_cross_domain(master_source, external_sources, tree_category)
+"""
 
     

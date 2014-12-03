@@ -92,7 +92,7 @@ if __name__ == "__main__":
 		names = getCatgoryNamesForRootParent(amazoneTrees, cat)
 		outputDict[cat] = names
 		for name in names.keys():
-			scratchText =  u' '.join((cat, " --> " , name , " --> " , names[name])).encode('utf-8').strip()
+			scratchText =  u' '.join((cat, "\t" , name , "\t" , names[name])).encode('utf-8').strip()
 			csvText = u' '.join((name , "," , names[name])).encode('utf-8').strip()
 			#cat + " --> " + name + " --> " + names[name].encode('utf-8').strip()
 			print scratchText
