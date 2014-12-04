@@ -26,6 +26,13 @@ def load_data(source_file = 'amazon_review_test.txt'):
 	print 'finished reading json'
 	return dataset
 
+def write_data(data, output_file):
+  print 'writing data to: ', output_file
+  data_pathname = os.path.join(data_directory, output_file)
+  with open(data_pathname, 'w+') as f:
+    for d in data:
+      f.write('%s\n'%json.dumps(d))
+  print 'finished writing'
 
 def read_from_sources(sources, tree_category, max_examples = 1000):
     # Return the an ordered pair of dicts, the Corpus for each source and the targets for each source
